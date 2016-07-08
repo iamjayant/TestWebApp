@@ -5,7 +5,7 @@
 
 <bean id = "HandlerMapping" class = "org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"></bean>
 
-<bean name="/welcome.html" class="com.testwebapp.welcome"/>
+<bean name="/welcome.html" class="com.testwebapp.WelcomeController"/>
 
 <bean id="viewResolver"
 	  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
