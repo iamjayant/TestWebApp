@@ -1,16 +1,21 @@
 package com.testwebapp;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.testwebapp.Serviceone;
 import com.testwebapp.Servicetwo;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 public class WelcomeController{
@@ -24,53 +29,46 @@ public String welcome(ModelMap model){
 	return "welcome";
 }
 
-@RequestMapping(value="/{key}", method = RequestMethod.GET)
-public String Welcome(ModelMap model, @PathVariable String key){
-	model.addAttribute("welcomeMessage", "Welcome to test web app!");
-	model.addAttribute("show", "Showing search results for '"+key+"'");
-	System.out.println(key);
-	servone.createraw();
-	servtwo.create();
-	List links = servone.fetchlinks(key);
-	  String [] linker = (String[]) links.toArray(new String[links.size()]);
-	int length = linker.length;
-	String data = "{";
-	int i = 0;
-	while(i<length){
-		data += "\""+i+"\":"+"\""+linker[i]+"\"";
-		i++;
-		if(i!=length)
-			data+=",";
+@RequestMapping(value = "/search/", method = RequestMethod.POST)
+public @ResponseBody String Search(@RequestParam ("key") String key)
+{
+    System.out.println( key );
+    servone.createraw();
+	ObjectMapper mapper = new ObjectMapper();
+	String data = null;
+	try {
+		data = mapper.writeValueAsString(servone.fetchlinks(key));
+		System.out.println(mapper.writeValueAsString(servone.fetchlinks(key)));
+
+	} catch (JsonGenerationException e) {
+		e.printStackTrace();
+	} catch (JsonMappingException e) {
+		e.printStackTrace();
+	} catch (IOException e) {
+		e.printStackTrace();
 	}
-	data+="}";
+	return data;
+    
+}
+
+@RequestMapping(value = "/links/", method = RequestMethod.POST)
+public @ResponseBody String searchDetails( @RequestParam ("link") String link)
+{
+	servtwo.create();
+	ObjectMapper mapper = new ObjectMapper();
+	String data = null;
+	try {
+		data = mapper.writeValueAsString(servtwo.fetchdetails(link));
+		System.out.println(data);
+
+	} catch (JsonGenerationException e) {
+		e.printStackTrace();
+	} catch (JsonMappingException e) {
+		e.printStackTrace();
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
 	System.out.println(data);
-	model.addAttribute("links", data);
-	return "welcome";
+	return data;
 }
-
-@RequestMapping(value="/{key}/{link}", method = RequestMethod.GET)
-public String Welcome(ModelMap model, @PathVariable String key, @PathVariable String link){
-	model.addAttribute("welcomeMessage", "Welcome to test web app!");
-	model.addAttribute("show", "Showing search results for '"+key+"'");
-	servone.createraw();
-	servtwo.create();
-	List links = servone.fetchlinks(key);
-	  String [] linker = (String[]) links.toArray(new String[links.size()]);
-	int length = linker.length;
-	String data = "{";
-	int i = 0;
-	while(i<length){
-		data += "\""+i+"\":"+"\""+linker[i]+"\"";
-		i++;
-		if(i!=length)
-			data+=",";
-	}
-	data+="}";
-	model.addAttribute("links", data);
-	model.addAttribute("key", key);
-	System.out.println(link);
-	model.addAttribute("detail", servtwo.fetchdetails(link));
-	return "welcome";
-}
-
 }
