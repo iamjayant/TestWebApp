@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Serviceone {
-	// String key1="key1",key2="key2",key3="key3";
 
 	static Map<String, List<String>> map = new HashMap<String, List<String>>();
 
@@ -34,12 +33,6 @@ public class Serviceone {
 	}
 
 	List fetchlinks(String key) {
-		// String fetchlinks(String key) {
-
-		/*
-		 * List ls = map.get(key); String str = ""; for (int i = 0; i <
-		 * ls.size(); i++) { str += (ls.get(i) + "\n"); } return str;
-		 */
 		return map.get(key);
 	}
 
